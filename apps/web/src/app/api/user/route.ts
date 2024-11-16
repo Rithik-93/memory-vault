@@ -19,12 +19,12 @@ export async function POST(req: NextRequest) {
         }, {
             status: 200
         })
-    } catch(e) {
+    } catch (e) {
         return NextResponse.json({
             message: e
         }, {
             status: 411
         })
     }
-    
+
 }

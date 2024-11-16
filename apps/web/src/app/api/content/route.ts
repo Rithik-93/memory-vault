@@ -2,33 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../database/src";
 
 
-export async function GET({ params }: { params: { contentId: number } }) {
-    const contentId = params.contentId;
 
-    try {
-        const content = await prisma.savedContent.findFirst({
-            where: {
-                id: contentId
-            }
-        })
-        return NextResponse.json({
-            content
-        }, {
-            status: 200
-        })
-    } catch (e) {
-        return NextResponse.json({
-            message: e
-        }, {
-            status: 500
-        })
+export async function GET(req: NextRequest, { params }: { params: { contentId: string } }) {
+    const { contentId } = params;
+
+    if (!contentId) {
+        return NextResponse.json(
+            { error: "contentId is required" },
+            { status: 400 }
+        );
     }
 
+    return NextResponse.json({ message: `Content ID is ${contentId}` });
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { contenId: number } }) {
     const { title, description } = await req.json();
-    const contenId = params.contenId
+    const { contenId } = params;
 
     try {
         await prisma.savedContent.update({
@@ -54,25 +44,23 @@ export async function PUT(req: NextRequest, { params }: { params: { contenId: nu
     }
 }
 
-export async function DELETE({params}:{params:{contentId: number}}) {
-    const contenId = params.contentId;
-    
+export async function DELETE(req: NextRequest, { params }: { params: { contentId: string } }) {
+    const contentId = parseInt(params.contentId, 10);
+
     try {
         await prisma.savedContent.delete({
             where: {
-                id: contenId
-            }
-        })
-        return NextResponse.json({
-            message: "deleted successfully"
-        }, {
-            status: 200
-        })
-    } catch(e) {
-        return NextResponse.json({
-            message: e
-        }, {
-            status: 500
-        })
+                id: contentId,
+            },
+        });
+        return NextResponse.json(
+            { message: "deleted successfully" },
+            { status: 200 }
+        );
+    } catch (e) {
+        return NextResponse.json(
+            { message: "Failed to delete content" },
+            { status: 500 }
+        );
     }
 }
